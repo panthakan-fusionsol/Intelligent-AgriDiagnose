@@ -1187,7 +1187,7 @@ print(f"Predicted: {pred_class} ({confidence:.2%})")
 | ResNet-50 | 224×224 | 25.6M | 96.1% | 35ms |
 | EfficientNet-V2-S | 224×224 | 21.5M | 96.5% | 28ms |
 
-*Tested on NVIDIA RTX 3090, batch size=1*
+*Tested on NVIDIA RTX 5060, batch size=1*
 
 ### 9.2 Training Time
 
@@ -1197,7 +1197,7 @@ print(f"Predicted: {pred_class} ({confidence:.2%})")
 | ResNet-50, BS=16 | 25 | 5 min | 2.08 hrs |
 | EfficientNet-V2, BS=16 | 25 | 4.5 min | 1.87 hrs |
 
-*Tested on NVIDIA RTX 3090, ~6000 training images*
+*Tested on NVIDIA RTX 5060, ~6000 training images*
 
 ---
 
