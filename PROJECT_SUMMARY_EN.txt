@@ -1,0 +1,454 @@
+================================================================================
+CORN LEAF DISEASE CLASSIFICATION PROJECT - SUMMARY
+================================================================================
+
+Project Overview:
+-----------------
+Deep learning system for detecting and classifying corn leaf diseases using
+ResNet architecture with GradCAM visualization and web-based interface.
+
+Last Updated: December 9, 2025
+
+================================================================================
+SUPPORTED DISEASE CLASSES (10 Classes)
+================================================================================
+
+1. Abnormality    - Herbicide Injury
+2. Blight         - Northern Corn Leaf Blight  
+3. Brown Spot     - Fungal infection with brown spots
+4. Curl           - Twisted Whorl (leaf deformation)
+5. Healthy        - No disease symptoms
+6. Mildew         - Downy Mildew
+7. Rust           - Orange/brown pustules
+8. Smut           - Black galls on plant parts
+9. Spot           - Leaf Sheath and Leaf Spot
+10. Virus         - Various viral infections
+
+================================================================================
+KEY COMPONENTS
+================================================================================
+
+1. TRAINING PIPELINE (train.py, model.py, corn_dataset.py, utils.py)
+   - Transfer learning with ResNet-18/50
+   - Pretrained on ImageNet
+   - Data augmentation: flip, rotate, affine, color jitter
+   - TensorBoard logging
+
+2. GRADCAM VISUALIZATION (simple_gradcam.py, video_gradcam.py)
+   - Heatmap overlays showing important image regions
+   - Uses layer4.1.conv2 for ResNet-18
+   - JET colormap: blue (low) → red (high activation)
+
+3. CONFIDENCE THRESHOLD (conf_thresh.py)
+   - Automated threshold selection
+   - Balances accuracy vs coverage
+   - Sweeps thresholds from 0 to 1
+
+4. WEB INTERFACE (web_asean_latest.py, languages.py)
+   - Streamlit-based multi-language app
+   - Azure Custom Vision for leaf detection
+   - ResNet-18 for disease classification
+   - GPT-4.1-mini for treatment recommendations
+   - Interactive GradCAM visualization
+
+================================================================================
+HYPERPARAMETERS (DEFAULT CONFIGURATION)
+================================================================================
+
+Image Processing:
+-----------------
+  Image Size:         224 x 224 pixels
+  Batch Size:         32
+  Num Workers:        0
+  Normalization:      ImageNet (mean=[0.485, 0.456, 0.406], 
+                                 std=[0.229, 0.224, 0.225])
+
+Optimization:
+-------------
+  Learning Rate:      0.001 (1e-3)
+  Weight Decay:       0.0001 (1e-4)
+  Epochs:             25
+  Optimizer:          Adam
+  Loss Function:      CrossEntropyLoss
+
+Learning Rate Scheduler:
+------------------------
+  Option 1 - StepLR:
+    - step_size: 7 epochs
+    - gamma: 0.1 (multiply LR by 0.1)
+  
+  Option 2 - CosineAnnealingLR:
+    - T_max: 25 epochs
+    - eta_min: 3e-6 (minimum LR)
+
+Model Architecture:
+-------------------
+  Default:            ResNet-18
+  Alternatives:       ResNet-34, ResNet-50, ResNet-101, EfficientNet-V2-S
+  Pretrained:         Yes (ImageNet weights)
+  Output Classes:     10 (corn diseases)
+
+Data Augmentation:
+------------------
+  Training (with ColorJitter):
+    - Resize & CenterCrop to 224x224
+    - RandomHorizontalFlip (p=0.5)
+    - RandomVerticalFlip (p=0.5)
+    - RandomAffine (translate=0.1, scale=0.9-1.1)
+    - RandomRotation (45 degrees)
+    - ColorJitter (brightness=0.4, contrast=0.4, saturation=0.4, hue=0.4)
+  
+  Training (without ColorJitter):
+    - Resize & CenterCrop to 224x224
+    - RandomHorizontalFlip (p=0.5)
+    - RandomVerticalFlip (p=0.5)
+    - RandomAffine (translate=0.1, scale=0.9-1.1)
+    - RandomRotation (90 degrees)
+  
+  Validation/Test:
+    - Resize to 224x224
+    - No augmentation
+
+================================================================================
+GRADCAM IMPLEMENTATION
+================================================================================
+
+Algorithm:
+----------
+1. Forward pass: Get feature maps and predictions
+2. Backward pass: Compute gradients w.r.t. target layer
+3. Global Average Pooling: Average gradients spatially
+4. Weighted combination: weights * feature_maps
+5. ReLU activation: Remove negative values
+6. Normalize to [0, 1]
+
+Target Layers:
+--------------
+  ResNet-18:  layer4.1.conv2 (last conv in BasicBlock)
+  ResNet-50:  layer4.2.conv3 (last conv in Bottleneck)
+
+Heatmap Overlay:
+----------------
+  - Resize heatmap to match crop region
+  - Apply JET colormap (blue → cyan → yellow → red)
+  - Blend with original image (alpha=0.35-0.5)
+
+Colormap Interpretation:
+------------------------
+  Blue:    Low activation (not important)
+  Cyan:    Moderate activation
+  Yellow:  High activation
+  Red:     Very high activation (most important)
+
+================================================================================
+CONFIDENCE THRESHOLD SELECTION
+================================================================================
+
+Purpose:
+--------
+Find optimal threshold balancing accuracy and coverage.
+
+Algorithm:
+----------
+1. Sweep thresholds from 0.0 to 1.0 (step=0.025)
+2. For each threshold:
+   - Filter predictions where max_probability >= threshold
+   - Calculate accuracy on filtered samples
+   - Calculate coverage (% of samples kept)
+3. Find intersection point where accuracy ≈ coverage
+4. Find threshold for target coverage (default: 80%)
+
+Metrics:
+--------
+  Accuracy:  Correct predictions / Total accepted predictions
+  Coverage:  Accepted predictions / Total predictions
+
+Typical Results:
+----------------
+  - Intersection: threshold=0.875, accuracy=95%, coverage=85%
+  - For 80% coverage: threshold=0.825, accuracy=93%
+  - For 90% coverage: threshold=0.750, accuracy=91%
+
+Output:
+-------
+  - accuracy_vs_confidence.png
+  - coverage_vs_confidence.png  
+  - accuracy_and_coverage_vs_confidence.png
+  - confidence_results.csv
+  - optimal_thresholds.txt
+
+================================================================================
+WEB INTERFACE (web_asean_latest.py)
+================================================================================
+
+Technology:
+-----------
+  Framework:    Streamlit
+  Model:        ResNet-18 (224x224)
+  Detection:    Azure Custom Vision API
+  AI:           GPT-4.1-mini (Azure OpenAI)
+
+Features:
+---------
+  ✓ Multi-language support (EN, TH, Vietnamese, Indonesian, Malay, etc.)
+  ✓ Dual input: Image URL or file upload
+  ✓ Auto leaf detection via Azure Custom Vision
+  ✓ Manual crop mode with interactive cropper
+  ✓ Disease classification with confidence scores
+  ✓ Per-leaf GradCAM visualization (toggle on/off)
+  ✓ AI-powered treatment recommendations (GPT-4.1-mini)
+  ✓ Mobile-responsive design
+  ✓ Session state management
+
+Pipeline:
+---------
+1. User uploads image or provides URL
+2. Azure Custom Vision detects leaf bounding boxes
+3. Filter boxes by detection confidence (default: 95%)
+4. For each detected leaf:
+   a. Crop region from original image
+   b. Preprocess (resize, normalize)
+   c. ResNet-18 classification
+   d. Check disease confidence (default: 97.5%)
+   e. Generate GradCAM heatmap (if requested)
+   f. Display results
+5. User can request GPT treatment advice per leaf
+
+Configurable Thresholds:
+-------------------------
+  Leaf Detection:        50-99% (default: 95%)
+  Disease Classification: 0-99% (default: 97.5%)
+
+Model Path:
+-----------
+  model_training/resnet18_224_cosine_croponly_10_jitter/checkpoints/best.pth
+
+================================================================================
+DATASET STRUCTURE
+================================================================================
+
+Directory Layout:
+-----------------
+All_Crops/
+├── train/
+│   ├── rust_train/
+│   ├── blight_train/
+│   ├── spot_train/
+│   ├── virus_train/
+│   ├── mildew_train/
+│   ├── healthy_train/
+│   ├── brownspot_train/
+│   ├── curl_train/
+│   ├── smut_train/
+│   └── abnormality_train/
+├── validation/
+│   ├── rust_val/
+│   ├── blight_val/
+│   └── ...
+└── test/
+    ├── rust_test/
+    └── ...
+
+Supported Formats:
+------------------
+  .jpg, .jpeg, .png, .bmp, .tif, .tiff, .webp
+
+Class Filtering:
+----------------
+  You can train on subset of classes using --selected_classes argument.
+
+================================================================================
+QUICK START COMMANDS
+================================================================================
+
+Installation:
+-------------
+  python -m venv venv
+  source venv/bin/activate  # Windows: venv\Scripts\activate
+  pip install -r requirements.txt
+
+Basic Training:
+---------------
+  python train.py \
+      --img_size 224 \
+      --batch_size 32 \
+      --lr 0.001 \
+      --num_epochs 25 \
+      --architecture resnet18 \
+      --scheduler cosine \
+      --selected_classes "rust,blight,spot,virus,mildew,healthy"
+
+Training with ColorJitter:
+--------------------------
+  python train.py \
+      --img_size 224 \
+      --batch_size 32 \
+      --lr 0.001 \
+      --num_epochs 25 \
+      --architecture resnet18 \
+      --scheduler cosine \
+      --jitter \
+      --selected_classes "rust,blight,spot,virus,mildew,healthy"
+
+Training ResNet-50:
+-------------------
+  python train.py \
+      --img_size 224 \
+      --batch_size 16 \
+      --lr 0.001 \
+      --num_epochs 25 \
+      --architecture resnet50 \
+      --scheduler cosine \
+      --selected_classes "rust,blight,spot,virus,mildew,healthy"
+
+Generate GradCAM:
+-----------------
+  python simple_gradcam.py \
+      --checkpoint model_training/resnet18_224_cosine_croponly_10/checkpoints/best.pth \
+      --input_dir All_Crops/test \
+      --output_dir gradcam_results/resnet18_test \
+      --img_size 224 \
+      --batch_size 8 \
+      --architecture resnet18 \
+      --alpha 0.35
+
+Find Optimal Threshold:
+------------------------
+  python conf_thresh.py \
+      --checkpoint model_training/resnet18_224_cosine_croponly_10/checkpoints/best.pth \
+      --val_dir All_Crops/validation \
+      --img_size 224 \
+      --threshold_step 0.025 \
+      --target_coverage 80
+
+Run Web Interface:
+------------------
+  export chat-gpt-api-key="your_api_key"
+  export AZURE_CUSTOM_VISION_ENDPOINT="your_endpoint"
+  export AZURE_CUSTOM_VISION_KEY="your_key"
+  streamlit run web_asean_latest.py
+
+Monitor Training (TensorBoard):
+--------------------------------
+  tensorboard --logdir model_training/resnet18_224_cosine_croponly_10/logs
+  # Open: http://localhost:6006
+
+================================================================================
+PERFORMANCE BENCHMARKS
+================================================================================
+
+Model Comparison (NVIDIA RTX 5060, batch size=1):
+--------------------------------------------------
+  Model               | Image Size | Params | Accuracy | Inference Time
+  --------------------|------------|--------|----------|---------------
+  ResNet-18           | 224×224    | 11.7M  | 95.2%    | 15ms
+  ResNet-50           | 224×224    | 25.6M  | 96.1%    | 35ms
+  EfficientNet-V2-S   | 224×224    | 21.5M  | 96.5%    | 28ms
+
+Training Time (NVIDIA RTX 5060, ~6000 images):
+-----------------------------------------------
+  Configuration            | Epochs | Time/Epoch | Total Time
+  -------------------------|--------|------------|------------
+  ResNet-18, BS=32         | 25     | 3 min      | 1.25 hrs
+  ResNet-50, BS=16         | 25     | 5 min      | 2.08 hrs
+  EfficientNet-V2, BS=16   | 25     | 4.5 min    | 1.87 hrs
+
+================================================================================
+TROUBLESHOOTING
+================================================================================
+
+CUDA Out of Memory:
+-------------------
+  Solution: Reduce batch size (--batch_size 16 or 8)
+           or reduce image size (--img_size 224)
+
+Low Validation Accuracy:
+-------------------------
+  Solution: Try cosine scheduler (--scheduler cosine)
+           Add ColorJitter (--jitter)
+           Increase epochs (--num_epochs 50)
+
+GradCAM Not Working:
+--------------------
+  Check layer name:
+    ResNet-18: "layer4.1.conv2"
+    ResNet-50: "layer4.2.conv3"
+
+Streamlit App Crashes:
+-----------------------
+  Solution: Increase memory limit
+           streamlit run web_asean_latest.py --server.maxUploadSize=200
+           Verify API keys are set correctly
+
+================================================================================
+KEY FILES REFERENCE
+================================================================================
+
+Training:
+---------
+  train.py             - Main training script
+  model.py             - Model architecture definitions
+  corn_dataset.py      - Dataset class and data loaders
+  utils.py             - Helper functions (visualization, evaluation)
+
+GradCAM:
+--------
+  simple_gradcam.py    - GradCAM implementation and CLI
+  video_gradcam.py     - GradCAM for video processing
+
+Threshold:
+----------
+  conf_thresh.py       - Confidence threshold selection
+
+Web Interface:
+--------------
+  web_asean_latest.py  - Latest Streamlit application
+  languages.py         - Multi-language support
+
+Model Checkpoints:
+------------------
+  model_training/resnet18_224_cosine_croponly_10_jitter/checkpoints/best.pth
+  (Default model used in web interface)
+
+================================================================================
+OUTPUT ARTIFACTS
+================================================================================
+
+Training Outputs (model_training/{run_name}/):
+-----------------------------------------------
+  checkpoints/best.pth          - Best model weights
+  logs/events.out.tfevents.*    - TensorBoard logs
+  training_curves.png           - Loss and accuracy plots
+  confusion_matrix.png          - Confusion matrix heatmap
+  classification_report.txt     - Precision, recall, F1-score
+
+GradCAM Outputs (gradcam_results/{run_name}/):
+-----------------------------------------------
+  {class_name}/
+    image_001_overlay.jpg       - GradCAM overlay
+    image_002_overlay.jpg
+    ...
+
+Threshold Outputs:
+------------------
+  accuracy_vs_confidence.png
+  coverage_vs_confidence.png
+  accuracy_and_coverage_vs_confidence.png
+  confidence_results.csv
+  optimal_thresholds.txt
+
+================================================================================
+CONTACT & LICENSE
+================================================================================
+
+License:       MIT License
+Last Updated:  December 9, 2025
+GitHub:        https://github.com/panthakan-fusionsol/Intelligent-AgriDiagnose/
+
+For questions or issues, please visit:
+- GitHub: https://github.com/panthakan-fusionsol/Intelligent-AgriDiagnose/
+- Issues: https://github.com/panthakan-fusionsol/Intelligent-AgriDiagnose/issues
+
+================================================================================
+END OF SUMMARY
+================================================================================

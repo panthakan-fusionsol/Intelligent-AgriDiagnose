@@ -1,0 +1,454 @@
+================================================================================
+โครงการจำแนกโรคใบข้าวโพด - สรุปโครงการ
+================================================================================
+
+ภาพรวมโครงการ:
+---------------
+ระบบ Deep Learning สำหรับตรวจจับและจำแนกโรคใบข้าวโพดโดยใช้สถาปัตยกรรม 
+ResNet พร้อม GradCAM visualization และอินเทอร์เฟซเว็บ
+
+อัปเดตล่าสุด: 9 ธันวาคม 2568
+
+================================================================================
+โรคที่รองรับ (10 ชนิด)
+================================================================================
+
+1. Abnormality    - Herbicide Injury (ความเสียหายจากสารเคมี)
+2. Blight         - Northern Corn Leaf Blight (โรคใบไหม้)
+3. Brown Spot     - จุดสีน้ำตาล
+4. Curl           - Twisted Whorl (ใบบิดเบี้ยว)
+5. Healthy        - สุขภาพดี ไม่มีโรค
+6. Mildew         - Downy Mildew (โรคราน้ำค้าง)
+7. Rust           - สนิมใบข้าวโพด
+8. Smut           - โรคถ่านดำ
+9. Spot           - โรคจุดใบและกาบใบ
+10. Virus         - โรคไวรัสต่างๆ
+
+================================================================================
+ส่วนประกอบหลัก
+================================================================================
+
+1. TRAINING PIPELINE (train.py, model.py, corn_dataset.py, utils.py)
+   - Transfer learning ด้วย ResNet-18/50
+   - Pretrained บน ImageNet
+   - Data augmentation: flip, rotate, affine, color jitter
+   - บันทึกข้อมูลด้วย TensorBoard
+
+2. GRADCAM VISUALIZATION (simple_gradcam.py, video_gradcam.py)
+   - Heatmap overlays แสดงบริเวณสำคัญในภาพ
+   - ใช้ layer4.1.conv2 สำหรับ ResNet-18
+   - JET colormap: น้ำเงิน (ต่ำ) → แดง (สูง)
+
+3. CONFIDENCE THRESHOLD (conf_thresh.py)
+   - เลือก threshold อัตโนมัติ
+   - สมดุลระหว่าง accuracy กับ coverage
+   - สแกน thresholds จาก 0 ถึง 1
+
+4. WEB INTERFACE (web_asean_latest.py, languages.py)
+   - แอป Streamlit รองรับหลายภาษา
+   - Azure Custom Vision สำหรับตรวจจับใบ
+   - ResNet-18 สำหรับจำแนกโรค
+   - GPT-4.1-mini สำหรับคำแนะนำการรักษา
+   - GradCAM visualization แบบ interactive
+
+================================================================================
+HYPERPARAMETERS (การตั้งค่าเริ่มต้น)
+================================================================================
+
+การประมวลผลภาพ:
+----------------
+  ขนาดภาพ:           224 x 224 พิกเซล
+  Batch Size:        32
+  Num Workers:       0
+  Normalization:     ImageNet (mean=[0.485, 0.456, 0.406], 
+                               std=[0.229, 0.224, 0.225])
+
+Optimization:
+-------------
+  Learning Rate:     0.001 (1e-3)
+  Weight Decay:      0.0001 (1e-4)
+  Epochs:            25
+  Optimizer:         Adam
+  Loss Function:     CrossEntropyLoss
+
+Learning Rate Scheduler:
+------------------------
+  ตัวเลือก 1 - StepLR:
+    - step_size: 7 epochs
+    - gamma: 0.1 (คูณ LR ด้วย 0.1)
+  
+  ตัวเลือก 2 - CosineAnnealingLR:
+    - T_max: 25 epochs
+    - eta_min: 3e-6 (LR ต่ำสุด)
+
+สถาปัตยกรรมโมเดล:
+-----------------
+  ค่าเริ่มต้น:        ResNet-18
+  ทางเลือกอื่น:       ResNet-34, ResNet-50, ResNet-101, EfficientNet-V2-S
+  Pretrained:        ใช่ (น้ำหนัก ImageNet)
+  Output Classes:    10 (โรคข้าวโพด)
+
+Data Augmentation:
+------------------
+  Training (มี ColorJitter):
+    - Resize & CenterCrop เป็น 224x224
+    - RandomHorizontalFlip (p=0.5)
+    - RandomVerticalFlip (p=0.5)
+    - RandomAffine (translate=0.1, scale=0.9-1.1)
+    - RandomRotation (45 องศา)
+    - ColorJitter (brightness=0.4, contrast=0.4, saturation=0.4, hue=0.4)
+  
+  Training (ไม่มี ColorJitter):
+    - Resize & CenterCrop เป็น 224x224
+    - RandomHorizontalFlip (p=0.5)
+    - RandomVerticalFlip (p=0.5)
+    - RandomAffine (translate=0.1, scale=0.9-1.1)
+    - RandomRotation (90 องศา)
+  
+  Validation/Test:
+    - Resize เป็น 224x224
+    - ไม่มี augmentation
+
+================================================================================
+การทำงานของ GRADCAM
+================================================================================
+
+อัลกอริทึม:
+-----------
+1. Forward pass: รับ feature maps และ predictions
+2. Backward pass: คำนวณ gradients ของ target layer
+3. Global Average Pooling: เฉลี่ย gradients ตามพื้นที่
+4. Weighted combination: weights * feature_maps
+5. ReLU activation: ลบค่าติดลบออก
+6. Normalize เป็น [0, 1]
+
+Target Layers:
+--------------
+  ResNet-18:  layer4.1.conv2 (conv สุดท้ายใน BasicBlock)
+  ResNet-50:  layer4.2.conv3 (conv สุดท้ายใน Bottleneck)
+
+Heatmap Overlay:
+----------------
+  - ปรับขนาด heatmap ให้ตรงกับส่วนที่ครอป
+  - ใช้ JET colormap (น้ำเงิน → ฟ้า → เหลือง → แดง)
+  - ผสมกับภาพต้นฉบับ (alpha=0.35-0.5)
+
+การตีความ Colormap:
+-------------------
+  น้ำเงิน:   Activation ต่ำ (ไม่สำคัญ)
+  ฟ้า:       Activation ปานกลาง
+  เหลือง:    Activation สูง
+  แดง:       Activation สูงมาก (สำคัญที่สุด)
+
+================================================================================
+การเลือก CONFIDENCE THRESHOLD
+================================================================================
+
+วัตถุประสงค์:
+-------------
+หา threshold ที่เหมาะสมซึ่งสมดุลระหว่าง accuracy และ coverage
+
+อัลกอริทึม:
+----------
+1. สแกน thresholds จาก 0.0 ถึง 1.0 (step=0.025)
+2. สำหรับแต่ละ threshold:
+   - กรองการทำนายที่ max_probability >= threshold
+   - คำนวณ accuracy บนตัวอย่างที่กรอง
+   - คำนวณ coverage (% ของตัวอย่างที่เก็บไว้)
+3. หาจุดตัดกันที่ accuracy ≈ coverage
+4. หา threshold สำหรับ target coverage (เริ่มต้น: 80%)
+
+เมตริก:
+--------
+  Accuracy:  การทำนายที่ถูกต้อง / การทำนายที่ยอมรับทั้งหมด
+  Coverage:  การทำนายที่ยอมรับ / การทำนายทั้งหมด
+
+ผลลัพธ์ทั่วไป:
+--------------
+  - จุดตัดกัน: threshold=0.875, accuracy=95%, coverage=85%
+  - สำหรับ 80% coverage: threshold=0.825, accuracy=93%
+  - สำหรับ 90% coverage: threshold=0.750, accuracy=91%
+
+Output:
+-------
+  - accuracy_vs_confidence.png
+  - coverage_vs_confidence.png  
+  - accuracy_and_coverage_vs_confidence.png
+  - confidence_results.csv
+  - optimal_thresholds.txt
+
+================================================================================
+อินเทอร์เฟซเว็บ (web_asean_latest.py)
+================================================================================
+
+เทคโนโลยี:
+----------
+  Framework:    Streamlit
+  Model:        ResNet-18 (224x224)
+  Detection:    Azure Custom Vision API
+  AI:           GPT-4.1-mini (Azure OpenAI)
+
+ฟีเจอร์:
+--------
+  ✓ รองรับหลายภาษา (EN, TH, เวียดนาม, อินโดนีเซีย, มาเลย์, ฯลฯ)
+  ✓ Input 2 แบบ: Image URL หรืออัปโหลดไฟล์
+  ✓ ตรวจจับใบอัตโนมัติผ่าน Azure Custom Vision
+  ✓ โหมดครอปด้วยมือแบบ interactive
+  ✓ จำแนกโรคพร้อม confidence scores
+  ✓ GradCAM visualization แต่ละใบ (เปิด/ปิดได้)
+  ✓ คำแนะนำการรักษาจาก AI (GPT-4.1-mini)
+  ✓ ออกแบบรองรับมือถือ
+  ✓ จัดการ session state
+
+Pipeline:
+---------
+1. ผู้ใช้อัปโหลดภาพหรือให้ URL
+2. Azure Custom Vision ตรวจจับ bounding boxes ของใบ
+3. กรอง boxes ตามความเชื่อมั่นการตรวจจับ (เริ่มต้น: 95%)
+4. สำหรับแต่ละใบที่ตรวจจับได้:
+   a. ครอปส่วนของภาพต้นฉบับ
+   b. ปรับขนาดและ normalize
+   c. จำแนกด้วย ResNet-18
+   d. ตรวจสอบความเชื่อมั่นโรค (เริ่มต้น: 97.5%)
+   e. สร้าง GradCAM heatmap (ถ้าร้องขอ)
+   f. แสดงผลลัพธ์
+5. ผู้ใช้สามารถขอคำแนะนำการรักษาจาก GPT แต่ละใบ
+
+Thresholds ที่ปรับได้:
+----------------------
+  การตรวจจับใบ:         50-99% (เริ่มต้น: 95%)
+  การจำแนกโรค:         0-99% (เริ่มต้น: 97.5%)
+
+เส้นทางโมเดล:
+--------------
+  model_training/resnet18_224_cosine_croponly_10_jitter/checkpoints/best.pth
+
+================================================================================
+โครงสร้างชุดข้อมูล
+================================================================================
+
+โครงสร้างไดเรกทอรี:
+-------------------
+All_Crops/
+├── train/
+│   ├── rust_train/
+│   ├── blight_train/
+│   ├── spot_train/
+│   ├── virus_train/
+│   ├── mildew_train/
+│   ├── healthy_train/
+│   ├── brownspot_train/
+│   ├── curl_train/
+│   ├── smut_train/
+│   └── abnormality_train/
+├── validation/
+│   ├── rust_val/
+│   ├── blight_val/
+│   └── ...
+└── test/
+    ├── rust_test/
+    └── ...
+
+รูปแบบไฟล์ที่รองรับ:
+---------------------
+  .jpg, .jpeg, .png, .bmp, .tif, .tiff, .webp
+
+การกรอง Class:
+--------------
+  คุณสามารถเทรนบน subset ของ classes โดยใช้ --selected_classes
+
+================================================================================
+คำสั่งเริ่มต้นใช้งาน
+================================================================================
+
+การติดตั้ง:
+-----------
+  python -m venv venv
+  source venv/bin/activate  # Windows: venv\Scripts\activate
+  pip install -r requirements.txt
+
+การเทรนพื้นฐาน:
+---------------
+  python train.py \
+      --img_size 224 \
+      --batch_size 32 \
+      --lr 0.001 \
+      --num_epochs 25 \
+      --architecture resnet18 \
+      --scheduler cosine \
+      --selected_classes "rust,blight,spot,virus,mildew,healthy"
+
+การเทรนพร้อม ColorJitter:
+--------------------------
+  python train.py \
+      --img_size 224 \
+      --batch_size 32 \
+      --lr 0.001 \
+      --num_epochs 25 \
+      --architecture resnet18 \
+      --scheduler cosine \
+      --jitter \
+      --selected_classes "rust,blight,spot,virus,mildew,healthy"
+
+การเทรน ResNet-50:
+------------------
+  python train.py \
+      --img_size 224 \
+      --batch_size 16 \
+      --lr 0.001 \
+      --num_epochs 25 \
+      --architecture resnet50 \
+      --scheduler cosine \
+      --selected_classes "rust,blight,spot,virus,mildew,healthy"
+
+สร้าง GradCAM:
+--------------
+  python simple_gradcam.py \
+      --checkpoint model_training/resnet18_224_cosine_croponly_10/checkpoints/best.pth \
+      --input_dir All_Crops/test \
+      --output_dir gradcam_results/resnet18_test \
+      --img_size 224 \
+      --batch_size 8 \
+      --architecture resnet18 \
+      --alpha 0.35
+
+หา Optimal Threshold:
+---------------------
+  python conf_thresh.py \
+      --checkpoint model_training/resnet18_224_cosine_croponly_10/checkpoints/best.pth \
+      --val_dir All_Crops/validation \
+      --img_size 224 \
+      --threshold_step 0.025 \
+      --target_coverage 80
+
+รันอินเทอร์เฟซเว็บ:
+-------------------
+  export chat-gpt-api-key="your_api_key"
+  export AZURE_CUSTOM_VISION_ENDPOINT="your_endpoint"
+  export AZURE_CUSTOM_VISION_KEY="your_key"
+  streamlit run web_asean_latest.py
+
+ติดตามการเทรน (TensorBoard):
+-----------------------------
+  tensorboard --logdir model_training/resnet18_224_cosine_croponly_10/logs
+  # เปิด: http://localhost:6006
+
+================================================================================
+PERFORMANCE BENCHMARKS
+================================================================================
+
+การเปรียบเทียบโมเดล (NVIDIA RTX 5060, batch size=1):
+----------------------------------------------------
+  โมเดล              | ขนาดภาพ | Params | Accuracy | เวลา Inference
+  -------------------|---------|--------|----------|----------------
+  ResNet-18          | 224×224 | 11.7M  | 95.2%    | 15ms
+  ResNet-50          | 224×224 | 25.6M  | 96.1%    | 35ms
+  EfficientNet-V2-S  | 224×224 | 21.5M  | 96.5%    | 28ms
+
+เวลาในการเทรน (NVIDIA RTX 5060, ~6000 ภาพ):
+--------------------------------------------
+  การตั้งค่า               | Epochs | เวลา/Epoch | เวลารวม
+  ------------------------|--------|-----------|----------
+  ResNet-18, BS=32        | 25     | 3 นาที    | 1.25 ชม.
+  ResNet-50, BS=16        | 25     | 5 นาที    | 2.08 ชม.
+  EfficientNet-V2, BS=16  | 25     | 4.5 นาที  | 1.87 ชม.
+
+================================================================================
+การแก้ไขปัญหา
+================================================================================
+
+CUDA Out of Memory:
+-------------------
+  วิธีแก้: ลด batch size (--batch_size 16 หรือ 8)
+          หรือลดขนาดภาพ (--img_size 224)
+
+Validation Accuracy ต่ำ:
+------------------------
+  วิธีแก้: ลอง cosine scheduler (--scheduler cosine)
+          เพิ่ม ColorJitter (--jitter)
+          เพิ่ม epochs (--num_epochs 50)
+
+GradCAM ไม่ทำงาน:
+-----------------
+  ตรวจสอบชื่อ layer:
+    ResNet-18: "layer4.1.conv2"
+    ResNet-50: "layer4.2.conv3"
+
+Streamlit App ล่ม:
+------------------
+  วิธีแก้: เพิ่ม memory limit
+          streamlit run web_asean_latest.py --server.maxUploadSize=200
+          ตรวจสอบว่า API keys ตั้งค่าถูกต้อง
+
+================================================================================
+ไฟล์อ้างอิงหลัก
+================================================================================
+
+Training:
+---------
+  train.py             - สคริปต์เทรนหลัก
+  model.py             - สถาปัตยกรรมโมเดล
+  corn_dataset.py      - Dataset class และ data loaders
+  utils.py             - ฟังก์ชันช่วย (visualization, evaluation)
+
+GradCAM:
+--------
+  simple_gradcam.py    - การทำ GradCAM และ CLI
+  video_gradcam.py     - GradCAM สำหรับวิดีโอ
+
+Threshold:
+----------
+  conf_thresh.py       - การเลือก confidence threshold
+
+อินเทอร์เฟซเว็บ:
+----------------
+  web_asean_latest.py  - แอปพลิเคชัน Streamlit ล่าสุด
+  languages.py         - รองรับหลายภาษา
+
+Model Checkpoints:
+------------------
+  model_training/resnet18_224_cosine_croponly_10_jitter/checkpoints/best.pth
+  (โมเดลเริ่มต้นที่ใช้ในอินเทอร์เฟซเว็บ)
+
+================================================================================
+ผลลัพธ์ที่ได้
+================================================================================
+
+ผลลัพธ์การเทรน (model_training/{run_name}/):
+--------------------------------------------
+  checkpoints/best.pth          - น้ำหนักโมเดลที่ดีสุด
+  logs/events.out.tfevents.*    - TensorBoard logs
+  training_curves.png           - กราฟ Loss และ accuracy
+  confusion_matrix.png          - Confusion matrix heatmap
+  classification_report.txt     - Precision, recall, F1-score
+
+ผลลัพธ์ GradCAM (gradcam_results/{run_name}/):
+----------------------------------------------
+  {class_name}/
+    image_001_overlay.jpg       - GradCAM overlay
+    image_002_overlay.jpg
+    ...
+
+ผลลัพธ์ Threshold:
+-----------------
+  accuracy_vs_confidence.png
+  coverage_vs_confidence.png
+  accuracy_and_coverage_vs_confidence.png
+  confidence_results.csv
+  optimal_thresholds.txt
+
+================================================================================
+ติดต่อและลิขสิทธิ์
+================================================================================
+
+ลิขสิทธิ์:     MIT License
+อัปเดตล่าสุด:  9 ธันวาคม 2568
+GitHub:        https://github.com/panthakan-fusionsol/Intelligent-AgriDiagnose/
+
+หากมีคำถามหรือปัญหา โปรดติดต่อที่:
+- GitHub: https://github.com/panthakan-fusionsol/Intelligent-AgriDiagnose/
+- Issues: https://github.com/panthakan-fusionsol/Intelligent-AgriDiagnose/issues
+
+================================================================================
+จบสรุปโครงการ
+================================================================================

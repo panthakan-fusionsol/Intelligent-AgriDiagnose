@@ -1,0 +1,197 @@
+image,gt,prediction
+Blight_crop_0005.jpg,blight,northern corn leaf blight
+Blight_crop_0013.jpg,blight,northern corn leaf blight
+Blight_crop_0015.jpg,blight,northern corn leaf blight
+Blight_crop_0028.jpg,blight,downy mildew
+Blight_crop_0029.jpg,blight,northern corn leaf blight
+Blight_crop_0041.jpg,blight,northern corn leaf blight
+Blight_crop_0042.jpg,blight,northern corn leaf blight
+Blight_crop_0044.jpg,blight,northern corn leaf blight
+Blight_crop_0045.jpg,blight,northern corn leaf blight
+Blight_crop_0052.jpg,blight,northern corn leaf blight
+Blight_crop_0071.jpg,blight,northern corn leaf blight
+Blight_crop_0084.jpg,blight,northern corn leaf blight
+Blight_crop_0131.jpg,blight,northern corn leaf blight
+Blight_crop_0134.jpg,blight,northern corn leaf blight
+Blight_crop_0143.jpg,blight,northern corn leaf blight
+Blight_crop_0163.jpg,blight,northern corn leaf blight
+Blight_crop_0171.jpg,blight,leaf sheath and leaf spot
+Blight_crop_0185.jpg,blight,northern corn leaf blight
+Blight_crop_0187.jpg,blight,northern corn leaf blight
+Blight_crop_0201.jpg,blight,rust
+Blight_crop_0207.jpg,blight,northern corn leaf blight
+Blight_crop_0216.jpg,blight,northern corn leaf blight
+Blight_crop_0222.jpg,blight,northern corn leaf blight
+Blight_crop_0231.jpg,blight,rust
+Blight_crop_0243.jpg,blight,northern corn leaf blight
+Blight_crop_0285.jpg,blight,northern corn leaf blight
+Blight_crop_0289.jpg,blight,northern corn leaf blight
+Blight_crop_0291.jpg,blight,northern corn leaf blight
+Blight_crop_0293.jpg,blight,northern corn leaf blight
+Healthy_crop_0013.jpg,healthy,healthy
+Healthy_crop_0019.jpg,healthy,healthy
+Healthy_crop_0025.jpg,healthy,healthy
+Healthy_crop_0037.jpg,healthy,healthy
+Healthy_crop_0039.jpg,healthy,healthy
+Healthy_crop_0069.jpg,healthy,healthy
+Healthy_crop_0074.jpg,healthy,healthy
+Healthy_crop_0075.jpg,healthy,healthy
+Healthy_crop_0076.jpg,healthy,healthy
+Healthy_crop_0099.jpg,healthy,healthy
+Healthy_crop_0105.jpg,healthy,healthy
+Healthy_crop_0122.jpg,healthy,healthy
+Healthy_crop_0146.jpg,healthy,healthy
+Healthy_crop_0151.jpg,healthy,healthy
+Healthy_crop_0163.jpg,healthy,downy mildew
+Healthy_crop_0183.jpg,healthy,healthy
+Healthy_crop_0187.jpg,healthy,healthy
+Healthy_crop_0190.jpg,healthy,healthy
+Healthy_crop_0192.jpg,healthy,healthy
+Healthy_crop_0196.jpg,healthy,healthy
+Healthy_crop_0217.jpg,healthy,healthy
+Healthy_crop_0227.jpg,healthy,healthy
+Healthy_crop_0233.jpg,healthy,healthy
+Healthy_crop_0235.jpg,healthy,healthy
+Healthy_crop_0249.jpg,healthy,healthy
+Healthy_crop_0265.jpg,healthy,healthy
+Healthy_crop_0268.jpg,healthy,healthy
+Healthy_crop_0279.jpg,healthy,healthy
+Healthy_crop_0286.jpg,healthy,healthy
+Healthy_crop_0292.jpg,healthy,healthy
+Healthy_crop_0296.jpg,healthy,healthy
+Healthy_crop_0314.jpg,healthy,healthy
+Healthy_crop_0326.jpg,healthy,healthy
+Mildew_crop_0003.jpg,mildew,downy mildew
+Mildew_crop_0008.jpg,mildew,downy mildew
+Mildew_crop_0013.jpg,mildew,downy mildew
+Mildew_crop_0039.jpg,mildew,downy mildew
+Mildew_crop_0056.jpg,mildew,downy mildew
+Mildew_crop_0067.jpg,mildew,healthy
+Mildew_crop_0078.jpg,mildew,downy mildew
+Mildew_crop_0083.jpg,mildew,downy mildew
+Mildew_crop_0101.jpg,mildew,downy mildew
+Mildew_crop_0109.jpg,mildew,downy mildew
+Mildew_crop_0111.jpg,mildew,downy mildew
+Mildew_crop_0113.jpg,mildew,downy mildew
+Mildew_crop_0126.jpg,mildew,healthy
+Mildew_crop_0127.jpg,mildew,downy mildew
+Mildew_crop_0145.jpg,mildew,downy mildew
+Mildew_crop_0150.jpg,mildew,downy mildew
+Mildew_crop_0154.jpg,mildew,downy mildew
+Mildew_crop_0180.jpg,mildew,downy mildew
+Mildew_crop_0187.jpg,mildew,downy mildew
+Mildew_crop_0198.jpg,mildew,downy mildew
+Mildew_crop_0202.jpg,mildew,downy mildew
+Mildew_crop_0212.jpg,mildew,downy mildew
+Mildew_crop_0216.jpg,mildew,downy mildew
+Mildew_crop_0226.jpg,mildew,downy mildew
+Mildew_crop_0228.jpg,mildew,downy mildew
+Mildew_crop_0236.jpg,mildew,downy mildew
+Mildew_crop_0239.jpg,mildew,downy mildew
+Mildew_crop_0274.jpg,mildew,healthy
+Mildew_crop_0290.jpg,mildew,downy mildew
+Mildew_crop_0292.jpg,mildew,downy mildew
+Mildew_crop_0294.jpg,mildew,downy mildew
+Mildew_crop_0303.jpg,mildew,downy mildew
+Mildew_crop_0314.jpg,mildew,downy mildew
+Rust_crop_0008.jpg,rust,rust
+Rust_crop_0018.jpg,rust,rust
+Rust_crop_0029.jpg,rust,rust
+Rust_crop_0030.jpg,rust,rust
+Rust_crop_0049.jpg,rust,rust
+Rust_crop_0063.jpg,rust,rust
+Rust_crop_0078.jpg,rust,rust
+Rust_crop_0093.jpg,rust,rust
+Rust_crop_0103.jpg,rust,rust
+Rust_crop_0110.jpg,rust,rust
+Rust_crop_0114.jpg,rust,virus
+Rust_crop_0115.jpg,rust,rust
+Rust_crop_0129.jpg,rust,rust
+Rust_crop_0141.jpg,rust,rust
+Rust_crop_0158.jpg,rust,rust
+Rust_crop_0168.jpg,rust,rust
+Rust_crop_0173.jpg,rust,rust
+Rust_crop_0178.jpg,rust,rust
+Rust_crop_0202.jpg,rust,rust
+Rust_crop_0211.jpg,rust,rust
+Rust_crop_0221.jpg,rust,leaf sheath and leaf spot
+Rust_crop_0222.jpg,rust,leaf sheath and leaf spot
+Rust_crop_0231.jpg,rust,rust
+Rust_crop_0257.jpg,rust,rust
+Rust_crop_0262.jpg,rust,leaf sheath and leaf spot
+Rust_crop_0263.jpg,rust,rust
+Rust_crop_0265.jpg,rust,rust
+Spot_crop_0034.jpg,spot,rust
+Spot_crop_0037.jpg,spot,virus
+Spot_crop_0046.jpg,spot,leaf sheath and leaf spot
+Spot_crop_0065.jpg,spot,rust
+Spot_crop_0068.jpg,spot,downy mildew
+Spot_crop_0103.jpg,spot,leaf sheath and leaf spot
+Spot_crop_0108.jpg,spot,leaf sheath and leaf spot
+Spot_crop_0120.jpg,spot,leaf sheath and leaf spot
+Spot_crop_0121.jpg,spot,downy mildew
+Spot_crop_0123.jpg,spot,downy mildew
+Spot_crop_0133.jpg,spot,leaf sheath and leaf spot
+Spot_crop_0141.jpg,spot,leaf sheath and leaf spot
+Spot_crop_0153.jpg,spot,downy mildew
+Spot_crop_0158.jpg,spot,leaf sheath and leaf spot
+Spot_crop_0160.jpg,spot,downy mildew
+Spot_crop_0170.jpg,spot,rust
+Spot_crop_0173.jpg,spot,downy mildew
+Spot_crop_0176.jpg,spot,leaf sheath and leaf spot
+Spot_crop_0221.jpg,spot,leaf sheath and leaf spot
+Spot_crop_0227.jpg,spot,downy mildew
+Spot_crop_0237.jpg,spot,leaf sheath and leaf spot
+Spot_crop_0242.jpg,spot,leaf sheath and leaf spot
+Spot_crop_0247.jpg,spot,leaf sheath and leaf spot
+Spot_crop_0249.jpg,spot,leaf sheath and leaf spot
+Spot_crop_0253.jpg,spot,leaf sheath and leaf spot
+Virus_crop_0008.jpg,virus,rust
+Virus_crop_0009.jpg,virus,downy mildew
+Virus_crop_0015.jpg,virus,downy mildew
+Virus_crop_0022.jpg,virus,downy mildew
+Virus_crop_0046.jpg,virus,virus
+Virus_crop_0072.jpg,virus,northern corn leaf blight
+Virus_crop_0084.jpg,virus,downy mildew
+Virus_crop_0092.jpg,virus,downy mildew
+Virus_crop_0093.jpg,virus,virus
+Virus_crop_0095.jpg,virus,downy mildew
+Virus_crop_0117.jpg,virus,downy mildew
+Virus_crop_0145.jpg,virus,virus
+Virus_crop_0147.jpg,virus,downy mildew
+Virus_crop_0153.jpg,virus,downy mildew
+Virus_crop_0157.jpg,virus,downy mildew
+Virus_crop_0174.jpg,virus,downy mildew
+Virus_crop_0175.jpg,virus,downy mildew
+Virus_crop_0181.jpg,virus,virus
+Virus_crop_0195.jpg,virus,virus
+Virus_crop_0205.jpg,virus,downy mildew
+Virus_crop_0208.jpg,virus,downy mildew
+Virus_crop_0209.jpg,virus,downy mildew
+Virus_crop_0228.jpg,virus,downy mildew
+Virus_crop_0271.jpg,virus,downy mildew
+Virus_crop_0273.jpg,virus,healthy
+Virus_crop_0277.jpg,virus,downy mildew
+Virus_crop_0280.jpg,virus,downy mildew
+Virus_crop_0281.jpg,virus,healthy
+Virus_crop_0285.jpg,virus,healthy
+Virus_crop_0309.jpg,virus,healthy
+Virus_crop_0340.jpg,virus,healthy
+Virus_crop_0344.jpg,virus,downy mildew
+Virus_crop_0349.jpg,virus,downy mildew
+Virus_crop_0366.jpg,virus,downy mildew
+Virus_crop_0372.jpg,virus,downy mildew
+Virus_crop_0378.jpg,virus,healthy
+Virus_crop_0382.jpg,virus,downy mildew
+Virus_crop_0387.jpg,virus,downy mildew
+Virus_crop_0397.jpg,virus,downy mildew
+Virus_crop_0422.jpg,virus,downy mildew
+Virus_crop_0430.jpg,virus,healthy
+Virus_crop_0439.jpg,virus,downy mildew
+Virus_crop_0445.jpg,virus,virus
+Virus_crop_0447.jpg,virus,downy mildew
+Virus_crop_0451.jpg,virus,downy mildew
+Virus_crop_0453.jpg,virus,downy mildew
+Virus_crop_0459.jpg,virus,downy mildew
+Virus_crop_0468.jpg,virus,downy mildew
+Virus_crop_0475.jpg,virus,downy mildew

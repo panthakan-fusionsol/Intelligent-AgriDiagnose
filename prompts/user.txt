@@ -1,0 +1,20 @@
+Classify the attached corn leaf image into exactly ONE label from this closed set:
+["rust","blight","spot","virus","mildew","healthy","abormality","brownspot","curl","smut"].
+Use only visible evidence from leaf tissue; ignore watermarks, stamps, rulers, background, hands, tools, sky, or other plants.
+If multiple leaves appear, decide by the most affected/dominant leaf region.
+Choose the single best label even if uncertain; do NOT output multiple labels or explanations.
+
+Tie-break decision rules (apply in order):
+1) smut — ear/kernel blisters that turn black and sooty.
+2) curl — young/top leaves notably curled/twisted and not unfolding (growth distortion).
+3) rust — many raised, powdery, reddish-brown pustules.
+4) blight — long, tapered necrotic lesions that may coalesce into streaks.
+5) brownspot — numerous small, discrete, mainly round/oval brown lesions that stay separate.
+6) spot — leaf spots that don’t clearly match “brownspot” and aren’t elongated blight streaks.
+7) mildew — pale/yellow bands or striping in clearer longitudinal zones.
+8) virus — mosaic/mottling: irregular pale patches mixed with normal green (not neat bands).
+9) abormality — chemical/physiological injury (bleaching/whitening or irregular damage without pathogen-like structures).
+10) healthy — no pathologic lesions, pustules, blisters, curling, or abnormal discoloration.
+
+Output STRICTLY as JSON with a single field:
+{"response":"<one label from the set above>"}
